@@ -3,11 +3,14 @@ package com.test;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -42,8 +45,11 @@ public class FormDownloaderTest {
 		driver = new ChromeDriver(options);
 		wait = new WebDriverWait(driver, 10);
 		try {
+		String filePath=System.getProperty("user.dir")+"/src/test/resources/excel/Document_download_selenium.xlsx";
+		File file =    new File(filePath);
+		FileInputStream inputStream = new FileInputStream(file); 			
 			// Load the Excel workbook
-			workbook = new XSSFWorkbook(System.getProperty("user.dir")+"//src//test//resources//excel//Document_download_selenium.xlsx");
+		workbook=new XSSFWorkbook(inputStream);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -74,14 +80,15 @@ public class FormDownloaderTest {
 			searchButton.click();
 			// Capture the start time
 			Cell startTimeCell = currentRow.createCell(4);
+			String startTime = getCurrentDateTime();
 			startTimeCell.setCellValue(getCurrentDateTime());
-			
+		
 			// Find all document links and click on each one
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
 			for (WebElement documentLink : viewElements) {
 				documentLink.click();
 				// Download the form				
-				Thread.sleep(3000);
+				Thread.sleep(20000);
 				downloadAndSave();
 				// Go back to the previous page for the next document
 				driver.navigate().back();
@@ -92,7 +99,26 @@ public class FormDownloaderTest {
 
 			// Capture the start time and end time on the Excel sheet
 			Cell endTimeCell = currentRow.createCell(5);
+			String endTime = getCurrentDateTime();
 			endTimeCell.setCellValue(getCurrentDateTime());
+			String timetaken=calculateTimeTaken(startTime, endTime);
+			System.out.println(timetaken);
+			
+			Cell timeTakenCell = currentRow.createCell(6);
+			timeTakenCell.setCellValue(timetaken);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 		}
 	}
 
@@ -138,20 +164,33 @@ public class FormDownloaderTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		return currentDateTime.format(formatter);
 	}
+	
+	   public static String calculateTimeTaken(String startTime, String endTime) {
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	        LocalDateTime startDateTime = LocalDateTime.parse(startTime, formatter);
+	        LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
 
+	        Duration duration = Duration.between(startDateTime, endDateTime);
+	        long seconds = duration.getSeconds();
+	        long hours = seconds / 3600;
+	        long minutes = (seconds % 3600) / 60;
+	        long remainingSeconds = seconds % 60;
+	        String timeTaken = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
+	        return timeTaken;
+	    }
+	
 	public static void downloadAndSave()  {
 		try {
 			// Create a Robot instance
 			Robot robot = new Robot();
-
-			// Simulate four TAB key presses
+			// Simulate TAB key presses
 			for (int i = 0; i < 8; i++) {
 				robot.keyPress(KeyEvent.VK_TAB);
 				robot.keyRelease(KeyEvent.VK_TAB);
-				Thread.sleep(300); // Adjust delay as needed
+				Thread.sleep(5000); // Adjust delay as needed
 			}
-			// Simulate an Enter key press
-			for (int i = 0; i <= 10; i++) {
+			// Simulate Enter key press
+			for (int i = 0; i < 10; i++) {
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
 			}
