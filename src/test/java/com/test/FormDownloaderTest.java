@@ -49,14 +49,14 @@ public class FormDownloaderTest {
 		}
 	}
 	@Test
-	public void testFormDownload() {
+	public void testFormDownload() throws InterruptedException {
 		// Open the link
 		driver.get("http://houseofforms.org/ActWiseForms.aspx?Search=&ActID=9650A6D7E5A396D0");
 
 		// Get the first sheet
 		Sheet sheet = workbook.getSheetAt(0);
 
-		// Get the total number of rows with data in the sheet
+		// Get the total number of rows with data in the sheet			
 		int totalRows = sheet.getLastRowNum() + 1;
 
 		// Iterate through each row
@@ -72,37 +72,26 @@ public class FormDownloaderTest {
 
 			WebElement searchButton = driver.findElement(By.id("ctl00_Search"));
 			searchButton.click();
-
+			// Capture the start time
+			Cell startTimeCell = currentRow.createCell(4);
+			startTimeCell.setCellValue(getCurrentDateTime());
+			
 			// Find all document links and click on each one
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
 			for (WebElement documentLink : viewElements) {
 				documentLink.click();
-
-				// Download the form
-				try {
-					Thread.sleep(20000);
-					downloadAndSave();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-
-				
-
+				// Download the form				
+				Thread.sleep(3000);
+				downloadAndSave();
 				// Go back to the previous page for the next document
 				driver.navigate().back();
 			}
-
 			// Update the status on the Excel sheet
 			Cell statusCell = currentRow.createCell(3);
 			statusCell.setCellValue("Downloaded");
 
 			// Capture the start time and end time on the Excel sheet
-			Cell startTimeCell = currentRow.createCell(4);
-			startTimeCell.setCellValue(getCurrentDateTime());
-
-			Cell endTimeCell = currentRow.createCell(3);
+			Cell endTimeCell = currentRow.createCell(5);
 			endTimeCell.setCellValue(getCurrentDateTime());
 		}
 	}
@@ -111,7 +100,7 @@ public class FormDownloaderTest {
 	public void tearDown() {
 		try {
 			// Save the changes to the workbook
-			FileOutputStream outputStream = new FileOutputStream("path/to/excel.xlsx");
+			FileOutputStream outputStream = new FileOutputStream(System.getProperty("user.dir")+"//src//test//resources//excel//Document_download_selenium.xlsx");
 			workbook.write(outputStream);
 			outputStream.close();
 		} catch (IOException e) {
@@ -159,13 +148,10 @@ public class FormDownloaderTest {
 			for (int i = 0; i < 8; i++) {
 				robot.keyPress(KeyEvent.VK_TAB);
 				robot.keyRelease(KeyEvent.VK_TAB);
-				Thread.sleep(3000); // Adjust delay as needed
+				Thread.sleep(300); // Adjust delay as needed
 			}
-					
-
-
 			// Simulate an Enter key press
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i <= 10; i++) {
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
 			}
