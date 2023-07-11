@@ -85,12 +85,12 @@ public class FormDownloaderTest {
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
 			for (WebElement documentLink : viewElements) {				
 				documentLink.click();							
-				Thread.sleep(50000);
+				Thread.sleep(45000);
 				// Download the form	
 				downloadAndSave();				
 				// Go back to the previous page for the next document
 				driver.navigate().back();
-				Thread.sleep(3000);	
+				Thread.sleep(2000);	
 			}
 			// Update the status on the Excel sheet
 			Cell statusCell = currentRow.createCell(3);
