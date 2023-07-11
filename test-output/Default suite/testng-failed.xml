@@ -3,13 +3,13 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="com.test.FormDownloaderTest">
+      <class name="com.test.FormDownloaderTest2">
         <methods>
-          <include name="testFormDownload"/>
-          <include name="setup"/>
           <include name="tearDown"/>
+          <include name="setup"/>
+          <include name="testFormDownload"/>
         </methods>
-      </class> <!-- com.test.FormDownloaderTest -->
+      </class> <!-- com.test.FormDownloaderTest2 -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
