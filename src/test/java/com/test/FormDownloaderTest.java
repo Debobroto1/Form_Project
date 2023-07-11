@@ -59,10 +59,8 @@ public class FormDownloaderTest {
 	public void testFormDownload() throws InterruptedException {
 		// Open the link
 		driver.get("http://houseofforms.org/ActWiseForms.aspx?Search=&ActID=9650A6D7E5A396D0");
-
-		// Get the first sheet
+		// Get to the first sheet
 		Sheet sheet = workbook.getSheetAt(0);
-
 		// Get the total number of rows with data in the sheet			
 		int totalRows = sheet.getLastRowNum() + 1;
 
@@ -72,32 +70,28 @@ public class FormDownloaderTest {
 			Row currentRow = sheet.getRow(row);
 			Cell formNameCell = currentRow.getCell(1);
 			String formName = formNameCell.getStringCellValue().replaceAll("[^\\x20-\\x7E]", "").trim();
-			// Search the form name on the website search section
+			// Search the form name on the website's search section
 			WebElement searchInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("ctl00_txtSearch")));
 			searchInput.clear();
 			searchInput.sendKeys(formName);
-
 			WebElement searchButton = driver.findElement(By.id("ctl00_Search"));
 			searchButton.click();
 			// Capture the start time
 			Cell startTimeCell = currentRow.createCell(4);
 			String startTime = getCurrentDateTime();
-			startTimeCell.setCellValue(getCurrentDateTime());
-
-			// Find all document links and click on each one
+			startTimeCell.setCellValue(getCurrentDateTime());			
+			//  click on each document link
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
-			for (WebElement documentLink : viewElements) {
-				
-				Thread.sleep(30000);		
+			for (WebElement documentLink : viewElements) {				
+				Thread.sleep(20000);		
 				documentLink.click();
 				// Download the form				
-				Thread.sleep(90000);
+				Thread.sleep(70000);
 				downloadAndSave();
-				Thread.sleep(20000);
+				Thread.sleep(5000);
 				// Go back to the previous page for the next document
 				driver.navigate().back();
-				Thread.sleep(20000);
-				//endtime
+				Thread.sleep(5000);	
 			}
 			// Update the status on the Excel sheet
 			Cell statusCell = currentRow.createCell(3);
@@ -159,8 +153,7 @@ public class FormDownloaderTest {
 				robot.keyRelease(KeyEvent.VK_TAB);
 				Thread.sleep(3000); // Adjust delay as needed
 			}
-			// Simulate Enter key press
-			
+			// Simulate Enter key press			
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
 				Thread.sleep(30000);
