@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
+import static com.utility.ScreenRecorderUtil.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
@@ -56,7 +56,8 @@ public class FormDownloaderTest {
 		}
 	}
 	@Test
-	public void testFormDownload() throws InterruptedException {
+	public void testFormDownload() throws Exception {
+		startRecord("testFormDownload");
 		// Open the link
 		driver.get("http://houseofforms.org/ActWiseForms.aspx?Search=&ActID=9650A6D7E5A396D0");
 		// Get to the first sheet
@@ -83,34 +84,31 @@ public class FormDownloaderTest {
 			//  click on each document link
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
 			for (WebElement documentLink : viewElements) {				
-				Thread.sleep(20000);		
-				documentLink.click();
-				// Download the form				
-				Thread.sleep(70000);
-				downloadAndSave();
-				Thread.sleep(5000);
+				documentLink.click();							
+				Thread.sleep(50000);
+				// Download the form	
+				downloadAndSave();				
 				// Go back to the previous page for the next document
 				driver.navigate().back();
-				Thread.sleep(5000);	
+				Thread.sleep(3000);	
 			}
 			// Update the status on the Excel sheet
 			Cell statusCell = currentRow.createCell(3);
 			statusCell.setCellValue("Downloaded");
-
-			// Capture the start time and end time on the Excel sheet
+			// Capturing the start time and end time on the Excel sheet
 			Cell endTimeCell = currentRow.createCell(5);
 			String endTime = getCurrentDateTime();
 			endTimeCell.setCellValue(getCurrentDateTime());
 			String timetaken=calculateTimeTaken(startTime, endTime);
 			System.out.println(timetaken);
-
+			//Updating the total time taken column
 			Cell timeTakenCell = currentRow.createCell(6);
 			timeTakenCell.setCellValue(timetaken);
 		}
 	}
 
 	@AfterClass
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		try {
 			// Save the changes to the workbook
 			FileOutputStream outputStream = new FileOutputStream(System.getProperty("user.dir")+"//src//test//resources//excel//Document_download_selenium.xlsx");
@@ -121,8 +119,8 @@ public class FormDownloaderTest {
 		}
 		// Quit the driver and close the browser
 		driver.quit();
+		stopRecord();
 	}
-
 	public static String getCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -133,7 +131,6 @@ public class FormDownloaderTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime startDateTime = LocalDateTime.parse(startTime, formatter);
 		LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
-
 		Duration duration = Duration.between(startDateTime, endDateTime);
 		long seconds = duration.getSeconds();
 		long hours = seconds / 3600;
@@ -142,7 +139,6 @@ public class FormDownloaderTest {
 		String timeTaken = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
 		return timeTaken;
 	}
-
 	public void downloadAndSave()  {
 		try {
 			// Create a Robot instance
@@ -156,9 +152,9 @@ public class FormDownloaderTest {
 			// Simulate Enter key press			
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
-				Thread.sleep(30000);
+				Thread.sleep(10000);
 				robot.keyPress(KeyEvent.VK_ENTER);
-				Thread.sleep(20000);
+				Thread.sleep(10000);
 		} catch (AWTException | InterruptedException e) {
 			e.printStackTrace();
 		}
