@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -43,13 +44,13 @@ public class FormDownloaderTest {
 		options.addArguments("--start-maximized");
 		// Create a new instance of the Chrome driver
 		driver = new ChromeDriver(options);
-		wait = new WebDriverWait(driver, 10);
+		wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		try {
-		String filePath=System.getProperty("user.dir")+"/src/test/resources/excel/Document_download_selenium.xlsx";
-		File file =    new File(filePath);
-		FileInputStream inputStream = new FileInputStream(file); 			
+			String filePath=System.getProperty("user.dir")+"/src/test/resources/excel/Document_download_selenium.xlsx";
+			File file =    new File(filePath);
+			FileInputStream inputStream = new FileInputStream(file); 			
 			// Load the Excel workbook
-		workbook=new XSSFWorkbook(inputStream);
+			workbook=new XSSFWorkbook(inputStream);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -82,16 +83,21 @@ public class FormDownloaderTest {
 			Cell startTimeCell = currentRow.createCell(4);
 			String startTime = getCurrentDateTime();
 			startTimeCell.setCellValue(getCurrentDateTime());
-		
+
 			// Find all document links and click on each one
 			List<WebElement> viewElements = driver.findElements(By.xpath("//a[text()=' View ']"));
 			for (WebElement documentLink : viewElements) {
+				
+				Thread.sleep(30000);		
 				documentLink.click();
 				// Download the form				
-				Thread.sleep(20000);
+				Thread.sleep(90000);
 				downloadAndSave();
+				Thread.sleep(20000);
 				// Go back to the previous page for the next document
 				driver.navigate().back();
+				Thread.sleep(20000);
+				//endtime
 			}
 			// Update the status on the Excel sheet
 			Cell statusCell = currentRow.createCell(3);
@@ -103,22 +109,9 @@ public class FormDownloaderTest {
 			endTimeCell.setCellValue(getCurrentDateTime());
 			String timetaken=calculateTimeTaken(startTime, endTime);
 			System.out.println(timetaken);
-			
+
 			Cell timeTakenCell = currentRow.createCell(6);
 			timeTakenCell.setCellValue(timetaken);
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 		}
 	}
 
@@ -132,54 +125,31 @@ public class FormDownloaderTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		// Quit the driver and close the browser
 		driver.quit();
 	}
 
-	private void saveDocument(String formName) throws IOException {
-		// Get the InputStream for the downloaded file
-		InputStream inputStream = new URL(driver.getCurrentUrl()).openStream();
-
-		// Specify the folder path to save the downloaded document
-		String folderPath = System.getProperty("user.dir")+"path/to/save/folder/";
-
-		// Create the OutputStream to save the document
-		OutputStream outputStream = new FileOutputStream(folderPath + formName + ".pdf");
-
-		// Read the bytes from the InputStream and write them to the OutputStream
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		while ((bytesRead = inputStream.read(buffer)) != -1) {
-			outputStream.write(buffer, 0, bytesRead);
-		}
-
-		// Close the streams
-		inputStream.close();
-		outputStream.close();
-	}
-
-	private String getCurrentDateTime() {
+	public static String getCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		return currentDateTime.format(formatter);
 	}
-	
-	   public static String calculateTimeTaken(String startTime, String endTime) {
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	        LocalDateTime startDateTime = LocalDateTime.parse(startTime, formatter);
-	        LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
 
-	        Duration duration = Duration.between(startDateTime, endDateTime);
-	        long seconds = duration.getSeconds();
-	        long hours = seconds / 3600;
-	        long minutes = (seconds % 3600) / 60;
-	        long remainingSeconds = seconds % 60;
-	        String timeTaken = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
-	        return timeTaken;
-	    }
-	
-	public static void downloadAndSave()  {
+	public static String calculateTimeTaken(String startTime, String endTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime startDateTime = LocalDateTime.parse(startTime, formatter);
+		LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
+
+		Duration duration = Duration.between(startDateTime, endDateTime);
+		long seconds = duration.getSeconds();
+		long hours = seconds / 3600;
+		long minutes = (seconds % 3600) / 60;
+		long remainingSeconds = seconds % 60;
+		String timeTaken = String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
+		return timeTaken;
+	}
+
+	public void downloadAndSave()  {
 		try {
 			// Create a Robot instance
 			Robot robot = new Robot();
@@ -187,18 +157,18 @@ public class FormDownloaderTest {
 			for (int i = 0; i < 8; i++) {
 				robot.keyPress(KeyEvent.VK_TAB);
 				robot.keyRelease(KeyEvent.VK_TAB);
-				Thread.sleep(5000); // Adjust delay as needed
+				Thread.sleep(3000); // Adjust delay as needed
 			}
 			// Simulate Enter key press
-			for (int i = 0; i < 10; i++) {
+			
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
-			}
+				Thread.sleep(30000);
+				robot.keyPress(KeyEvent.VK_ENTER);
+				Thread.sleep(20000);
 		} catch (AWTException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
-
 	}
 }
 
